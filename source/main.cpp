@@ -1,4 +1,8 @@
+#include <algorithm>
+#include <cstdint>
+#include <cmath>
 #include <iostream>
+#define NOMINMAX
 #include <windows.h>
 
 #include "Color.hpp"
@@ -52,17 +56,66 @@ void DrawLine(uint32_t* buffer, Line2 line, Color color)
     }
 }
 
+double EdgeFunction(Vector2 start, Vector2 end, double x, double y)
+{
+    return (end.x - start.x) * (y - start.y) -
+        (end.y - start.y) * (x - start.x);
+}
+
+bool IsPointInTriangle(const Triangle2& triangle, double x, double y)
+{
+    const double area = EdgeFunction(
+        triangle.vertexA, triangle.vertexB,
+        triangle.vertexC.x, triangle.vertexC.y);
+    if (area == 0.0) {
+        return false;
+    }
+
+    const double edgeAB = EdgeFunction(triangle.vertexA, triangle.vertexB, x, y);
+    const double edgeBC = EdgeFunction(triangle.vertexB, triangle.vertexC, x, y);
+    const double edgeCA = EdgeFunction(triangle.vertexC, triangle.vertexA, x, y);
+
+    if (area > 0.0) {
+        return edgeAB >= 0.0 && edgeBC >= 0.0 && edgeCA >= 0.0;
+    }
+    return edgeAB <= 0.0 && edgeBC <= 0.0 && edgeCA <= 0.0;
+}
+
+void DrawTriangle(uint32_t* buffer, Triangle2 triangle, Color color)
+{
+    const int minX = std::max(0, std::min({
+        triangle.vertexA.x, triangle.vertexB.x, triangle.vertexC.x
+    }));
+    const int maxX = std::min(static_cast<int>(WIDTH) - 1, std::max({
+        triangle.vertexA.x, triangle.vertexB.x, triangle.vertexC.x
+    }));
+    const int minY = std::max(0, std::min({
+        triangle.vertexA.y, triangle.vertexB.y, triangle.vertexC.y
+    }));
+    const int maxY = std::min(static_cast<int>(HEIGHT) - 1, std::max({
+        triangle.vertexA.y, triangle.vertexB.y, triangle.vertexC.y
+    }));
+
+    for (int y = minY; y <= maxY; ++y) {
+        for (int x = minX; x <= maxX; ++x) {
+            if (IsPointInTriangle(triangle, x + 0.5, y + 0.5)) { // (x + 0.5, y + 0.5) is the pixel center
+                DrawPoint(buffer, Vector2{ x, y }, color);
+            }
+        }
+    }
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     HWND hwnd = CreateWindowEx(0, "STATIC", "CPU Renderer", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 100, 100, WIDTH, HEIGHT, nullptr, nullptr, hInstance, nullptr);
 
     HDC hdc = GetDC(hwnd);
 
-    Line2 line {
-        Vector2(100, 100),
-        Vector2(300, 300)
-    };
-    DrawLine(framebuffer, line, Color::WHITE);
+    DrawTriangle(framebuffer, Triangle2{
+        Vector2{ 120, 100 },
+        Vector2{ 650, 180 },
+        Vector2{ 300, 520 }
+    }, Color::WHITE);
 
     BITMAPINFO bmi {};
     bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
