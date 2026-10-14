@@ -4,6 +4,7 @@
 #include <iostream>
 #define NOMINMAX
 #include <windows.h>
+#include <windowsx.h>
 
 #include "Color.hpp"
 #include "Geometry.hpp"
@@ -12,6 +13,10 @@ constexpr unsigned int WIDTH = 800;
 constexpr unsigned int HEIGHT = 600;
 
 uint32_t framebuffer[WIDTH * HEIGHT];
+bool keys[256] = {};
+int mouseX = 0;
+int mouseY = 0;
+bool leftMouseDown = false;
 
 void DrawPoint(uint32_t* buffer, Vector2 position, Color color)
 {
@@ -105,9 +110,66 @@ void DrawTriangle(uint32_t* buffer, Triangle2 triangle, Color color)
     }
 }
 
+LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message) {
+        case WM_KEYDOWN: {
+            if (wParam < 256) {
+                keys[wParam] = true;
+            }
+            return 0;
+        }
+
+        case WM_KEYUP: {
+            if (wParam < 256) {
+                keys[wParam] = false;
+            }
+            return 0;
+        }
+
+        case WM_MOUSEMOVE: {
+            mouseX = GET_X_LPARAM(lParam);
+            mouseY = GET_Y_LPARAM(lParam);
+            return 0;
+        }
+
+        case WM_LBUTTONDOWN: {
+            leftMouseDown = true;
+            mouseX = GET_X_LPARAM(lParam);
+            mouseY = GET_Y_LPARAM(lParam);
+            return 0;
+        }
+
+        case WM_LBUTTONUP: {
+            leftMouseDown = false;
+            return 0;
+        }
+
+        case WM_DESTROY: {
+            PostQuitMessage(0);
+            return 0;
+        }
+    }
+
+    return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    HWND hwnd = CreateWindowEx(0, "STATIC", "CPU Renderer", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 100, 100, WIDTH, HEIGHT, nullptr, nullptr, hInstance, nullptr);
+    WNDCLASSA windowClass {
+        .lpfnWndProc = WndProc,
+        .hInstance = hInstance,
+        .lpszClassName = "CpuRendererWindow"
+    };
+    RegisterClassA(&windowClass);
+
+    HWND hwnd = CreateWindowExA(
+        0,
+        windowClass.lpszClassName,
+        "CPU Renderer",
+        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+        100, 100, WIDTH, HEIGHT,
+        nullptr, nullptr, hInstance, nullptr);
 
     HDC hdc = GetDC(hwnd);
 
@@ -125,7 +187,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     bmi.bmiHeader.biBitCount = 32;
     bmi.bmiHeader.biCompression = BI_RGB;
 
-    while(1) {
+    MSG message {};
+    while(true) {
+        while (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE)) {
+            if (message.message == WM_QUIT) {
+                return 0;
+            }
+            TranslateMessage(&message);
+            DispatchMessage(&message);
+
+            if (keys[VK_ESCAPE]) {
+                DestroyWindow(hwnd);
+            }
+        }
         StretchDIBits(hdc, 0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, framebuffer, &bmi, DIB_RGB_COLORS, SRCCOPY);
     }
 }

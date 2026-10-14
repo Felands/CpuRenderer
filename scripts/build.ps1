@@ -47,7 +47,7 @@ if ($Build) {
 
 if ($Run) {
     Write-Host "Running demo..." -ForegroundColor DarkYellow
-    $executable = Join-Path $buildDirectory "Debug\CpuDemo.exe"
+    $executable = Join-Path $buildDirectory "Debug\CpuRenderer.exe"
     Push-Location (Split-Path -Parent $executable)
     try {
         & $executable
