@@ -19,17 +19,50 @@ void DrawPoint(uint32_t* buffer, Vector2 position, Color color)
     buffer[position.y * WIDTH + position.x] = static_cast<uint32_t>(color);
 }
 
+void DrawLine(uint32_t* buffer, Line2 line, Color color)
+{
+    Vector2 start = line.start;
+    Vector2 end = line.end;
+
+    const int dx = std::abs(start.x - end.x);
+    const int sx = (start.x < end.x) ? 1 : -1;
+
+    const int dy = -std::abs(start.y - end.y);
+    const int sy = (start.y < end.y) ? 1 : -1;
+
+    int error = dx + dy;
+
+    while (true) {
+        DrawPoint(buffer, start, color);
+
+        if (start.x == end.x && start.y == end.y) {
+            break;
+        }
+
+        const int twiceError = 2 * error;
+        if (twiceError >= dy) {
+            error += dy;
+            start.x += sx;
+        }
+
+        if (twiceError <= dx) {
+            error += dx;
+            start.y += sy;
+        }
+    }
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     HWND hwnd = CreateWindowEx(0, "STATIC", "CPU Renderer", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 100, 100, WIDTH, HEIGHT, nullptr, nullptr, hInstance, nullptr);
 
     HDC hdc = GetDC(hwnd);
 
-    for (size_t x = 0; x < WIDTH; x++) {
-        for (size_t y = 0; y < HEIGHT; y++) {
-            DrawPoint(framebuffer, Vector2(x, y), Color::WHITE);
-        }
-    }
+    Line2 line {
+        Vector2(100, 100),
+        Vector2(300, 300)
+    };
+    DrawLine(framebuffer, line, Color::WHITE);
 
     BITMAPINFO bmi {};
     bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
