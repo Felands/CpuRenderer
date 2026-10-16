@@ -127,11 +127,53 @@ Vector<ROW_COUNT> operator*(const Matrix<ROW_COUNT, COLUM_COUNT>& lhs, const Vec
     return ret;
 }
 
+template<unsigned int N1, unsigned int N2, unsigned int N3>
+Matrix<N1, N3> operator*(const Matrix<N1, N2>& lhs, const Matrix<N2,N3>& rhs)
+{
+    Matrix<N1,N3> ret {};
+    for (size_t i = 0; i < N1; i++) {
+        for (size_t j = 0; j < N3; j++) {
+            for (size_t k = 0; k < N2; k++) {
+                ret[i][j] += lhs[i][k] * rhs[k][j];
+            }
+        }
+    }
+    return ret;
+}
+
+
 using Matrix4_4 = Matrix<4, 4>;
 
 const Matrix4_4 IDENTITY_MATRIX_4 = {
     {
         { 1, 0, 0, 0 },
+        { 0, 1, 0, 0 },
+        { 0, 0, 1, 0 },
+        { 0, 0, 0, 1 }
+    }
+};
+
+const Matrix4_4 SCALE_HALF_MATRIX_4 = {
+    {
+        { 0.5, 0, 0, 0 },
+        { 0, 0.5, 0, 0 },
+        { 0, 0, 0.5, 0 },
+        { 0, 0, 0, 1 }
+    }
+};
+
+const Matrix4_4 ROTATION_LEFT_90_MATRIX_4 = {
+    {
+        { 0, 0, 1, 0 },
+        { 0, 1, 0, 0 },
+        { -1, 0, 0, 0 },
+        { 0, 0, 0, 1 }
+    }
+};
+
+const Matrix4_4 TRANSLATION_RIGHT_500_MATRIX_4 = {
+    {
+        { 1, 0, 0, 500 },
         { 0, 1, 0, 0 },
         { 0, 0, 1, 0 },
         { 0, 0, 0, 1 }

@@ -44,7 +44,8 @@ void VertexShader::Transform(Point4& point)
 
 void VertexShader::InitModelMatrix()
 {
-    m_modelMatrix = IDENTITY_MATRIX_4;
+    // Scale the model down by a factor of 2, rotate it 90 degrees to the left around the y-axis, shift it 500 pixels in the positive x-direction, and place it into the space.
+    m_modelMatrix = TRANSLATION_RIGHT_500_MATRIX_4 * (ROTATION_LEFT_90_MATRIX_4 * SCALE_HALF_MATRIX_4);
     return;
 }
 

@@ -93,10 +93,11 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    // 
     Triangle3 triangle {
-        Point3 { 120, 100, -100 },
-        Point3 { 650, 180, -200 },
-        Point3 { 300, 520, -300 }
+        Point3 { 100, 500, -100 },
+        Point3 { 500, 500, -200 },
+        Point3 { 100, 100, -300 }
     };
     VertexShader::GetInstance().Transform(triangle);
     DrawTriangle(Triangle2 {
