@@ -1,24 +1,61 @@
 #include "VertexShader.hpp"
+#include "Log.hpp"
 
-void VertexShader::Transform()
+bool VertexShader::Init()
 {
-    return;
+    if (m_isInit) {
+        LOG_WARN("Vertex shader has been initialized.");
+        return true;
+    }
+
+    InitModelMatrix();
+    InitViewMatrix();
+    InitPrespectiveMatrix();
+
+    m_isInit = true;
+    LOG_INFO("Vertex shader initialization successful.");
+}
+
+void VertexShader::Transform(Triangle3& triangle)
+{
+    Point4 tmpA { triangle.vertexA.x, triangle.vertexA.y, triangle.vertexA.z, 1 };
+    Transform(tmpA);
+    triangle.vertexA.x = tmpA.x;
+    triangle.vertexA.y = tmpA.y;
+    triangle.vertexA.z = tmpA.z;
+
+    Point4 tmpB { triangle.vertexB.x, triangle.vertexB.y, triangle.vertexB.z, 1 };
+    Transform(tmpB);
+    triangle.vertexB.x = tmpB.x;
+    triangle.vertexB.y = tmpB.y;
+    triangle.vertexB.z = tmpB.z;
+
+    Point4 tmpC { triangle.vertexC.x, triangle.vertexC.y, triangle.vertexC.z, 1 };
+    Transform(tmpC);
+    triangle.vertexC.x = tmpC.x;
+    triangle.vertexC.y = tmpC.y;
+    triangle.vertexC.z = tmpC.z;
+}
+
+void VertexShader::Transform(Point4& point)
+{
+    point = m_prespectiveMatrix * (m_viewMatrix * (m_modelMatrix * point));
 }
 
 void VertexShader::InitModelMatrix()
 {
-    //modelMatrix = IDENTITY_MATRIX_4;
+    m_modelMatrix = IDENTITY_MATRIX_4;
     return;
 }
 
 void VertexShader::InitViewMatrix()
 {
-    //viewMatrix = IDENTITY_MATRIX_4;
+    m_viewMatrix = IDENTITY_MATRIX_4;
     return;
 }
 
 void VertexShader::InitPrespectiveMatrix()
 {
-    //prespectiveMatrix = IDENTITY_MATRIX_4;
+    m_prespectiveMatrix = IDENTITY_MATRIX_4;
     return;
 }

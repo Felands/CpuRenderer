@@ -89,8 +89,21 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    VertexShader vertexShader;
-    DrawTriangle(Triangle2{Point2{ 120, 100 }, Point2{ 650, 180 }, Point2{ 300, 520 }}, Color::WHITE);
+    if (!VertexShader::GetInstance().Init()) {
+        return -1;
+    }
+
+    Triangle3 triangle {
+        Point3 { 120, 100, -100 },
+        Point3 { 650, 180, -200 },
+        Point3 { 300, 520, -300 }
+    };
+    VertexShader::GetInstance().Transform(triangle);
+    DrawTriangle(Triangle2 {
+        Point2 { triangle.vertexA.x, triangle.vertexA.y },
+        Point2 { triangle.vertexB.x, triangle.vertexB.y },
+        Point2 { triangle.vertexC.x, triangle.vertexC.y }
+    }, Color::WHITE);
 
     while(true) {
         Window::GetInstance().HandleInput();

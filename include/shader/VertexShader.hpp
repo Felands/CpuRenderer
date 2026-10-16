@@ -12,30 +12,22 @@ public:
         return vertexShader;
     }
 
-    void Init()
-    {
-        if (isInit) {
-            return;
-        }
+    bool Init();
 
-        InitModelMatrix();
-        InitViewMatrix();
-        InitPrespectiveMatrix();
-
-        isInit = true;
-    }
-
-    void Transform();
+    void Transform(Triangle3& triangle);
 
 private:
+    VertexShader() {}
+    ~VertexShader() {}
     void InitModelMatrix();
     void InitViewMatrix();
     void InitPrespectiveMatrix();
+    void Transform(Point4& point);
 
-    bool isInit { false };
-    Matrix4_4 modelMatrix;
-    Matrix4_4 viewMatrix;
-    Matrix4_4 prespectiveMatrix;
+    bool m_isInit { false };
+    Matrix4_4 m_modelMatrix;
+    Matrix4_4 m_viewMatrix;
+    Matrix4_4 m_prespectiveMatrix;
 };
 
 #endif

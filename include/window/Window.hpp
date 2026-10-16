@@ -66,6 +66,8 @@ public:
     void Render();
 
 private:
+    Window() {}
+    ~Window() {}
     static LRESULT CALLBACK WindowProcess(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
     LRESULT HandleWindowMessage(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
