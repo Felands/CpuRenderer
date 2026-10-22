@@ -26,6 +26,22 @@ struct Vector<3> {
     double x;
     double y;
     double z;
+
+    double& operator[](const size_t index)
+    {
+        assert(index >= 0 && index < 3);
+        if (index == 0) return x;
+        if (index == 1) return y;
+        if (index == 2) return z;
+    }
+
+    double operator[](const size_t index) const
+    {
+        assert(index >= 0 && index < 3);
+        if (index == 0) return x;
+        if (index == 1) return y;
+        if (index == 2) return z;
+    }
 };
 
 template<>
@@ -81,6 +97,15 @@ struct Triangle3 {
 };
 
 using Point4 = Vector<4>;
+
+template<int Dimension>
+Vector<Dimension> operator-(const Vector<Dimension>& lhs, const Vector<Dimension>& rhs) {
+    Vector<Dimension> ret = lhs;
+    for (size_t index = 0; index < Dimension; index++) {
+        ret[index] -= rhs[index];
+    }
+    return ret;
+}
 
 template<int Dimension>
 double operator*(const Vector<Dimension>& lhs, const Vector<Dimension>& rhs) {

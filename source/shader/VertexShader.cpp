@@ -46,14 +46,22 @@ void VertexShader::InitModelMatrix()
 {
     // Scale the model down by a factor of 2, rotate it 90 degrees to the left around the y-axis, shift it 500 pixels in the positive x-direction, and place it into the space.
     m_modelMatrix = TRANSLATION_RIGHT_500_MATRIX_4 * (ROTATION_LEFT_90_MATRIX_4 * SCALE_HALF_MATRIX_4);
-    return;
 }
 
 void VertexShader::InitViewMatrix()
 {
-    m_viewMatrix = IDENTITY_MATRIX_4;
-    return;
-}
+    static Vector<3> cameraPosition { -10, 8, 5 };
+    static Vector<3> focusPositin { 0, 0, 0 };
+    Vector<3> direction = focusPositin - cameraPosition;
+    m_viewMatrix = {
+        {
+            { 1, 0, 0, -direction.x },
+            { 0, 1, 0, -direction.y },
+            { 0, 0, 1, -direction.z },
+            { 0, 0, 0, 1 }
+        }
+    };
+};
 
 void VertexShader::InitPrespectiveMatrix()
 {

@@ -3,7 +3,7 @@
 
 #include "Geometry.hpp"
 
-// 使用右手坐标系：+x向右、+y向上、+z向后
+// 使用右手坐标系：+x向右、+y向下、+z向后
 class VertexShader {
 public:
     static VertexShader& GetInstance()
