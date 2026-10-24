@@ -1,5 +1,10 @@
 #include "Window.hpp"
-#include "Log.hpp"
+#include "Logger.hpp"
+
+Window::~Window()
+{
+    DeInit();
+}
 
 bool Window::Init()
 {
@@ -37,6 +42,7 @@ bool Window::Init()
 
     m_isInit = true;
     LOG_INFO("Window initialization successful.");
+    return true;
 }
 
 void Window::DeInit()

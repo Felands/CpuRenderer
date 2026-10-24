@@ -1,7 +1,9 @@
 param(
     [switch] $Clean,
     [switch] $Build,
-    [switch] $Run
+    [switch] $Run,
+    [ValidateSet("DEBUG", "INFO", "WARN", "ERROR", "OFF")]
+    [string] $LogLevel = "INFO"
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,6 +16,8 @@ $sourceDirectory = [System.IO.Path]::GetFullPath((Join-Path $scriptDirectory "..
 $manifestDirectory = $sourceDirectory
 $manifestPath = Join-Path $manifestDirectory "vcpkg.json"
 $buildDirectory = Join-Path $sourceDirectory "build"
+$assetsDirectory = Join-Path $sourceDirectory "assets"
+$executableDirectory = Join-Path $buildDirectory "Debug"
 
 if ($Clean) {
     if (Test-Path $buildDirectory) {
@@ -31,7 +35,8 @@ if ($Build) {
     Write-Host "Configuring project..." -ForegroundColor DarkYellow
     & $cmake.Source -S $sourceDirectory -B $buildDirectory `
         "-DCMAKE_TOOLCHAIN_FILE=$vcpkgToolchain" `
-        "-DVCPKG_MANIFEST_DIR=$manifestDirectory"
+        "-DVCPKG_MANIFEST_DIR=$manifestDirectory" `
+        "-DLOG_LEVEL=$LogLevel"
     if ($LASTEXITCODE -ne 0) {
         throw "CMake configuration failed with exit code $LASTEXITCODE."
     }
@@ -42,12 +47,14 @@ if ($Build) {
         throw "CMake build failed with exit code $LASTEXITCODE."
     }
 
+    Write-Host "Getting resources ready..." -ForegroundColor DarkYellow
+    Copy-Item -Path (Join-Path $assetsDirectory "*.tga") -Destination $executableDirectory -Force
     Write-Host "Build completed successfully." -ForegroundColor DarkGreen
 }
 
 if ($Run) {
     Write-Host "Running demo..." -ForegroundColor DarkYellow
-    $executable = Join-Path $buildDirectory "Debug\CpuRenderer.exe"
+    $executable = Join-Path $executableDirectory "CpuRenderer.exe"
     Push-Location (Split-Path -Parent $executable)
     try {
         & $executable

@@ -4,6 +4,7 @@
 
 #include "Color.hpp"
 #include "Geometry.hpp"
+#include "TgaImage.hpp"
 #include "VertexShader.hpp"
 #include "Window.hpp"
 
@@ -85,6 +86,10 @@ void DrawTriangle(Triangle2 triangle, Color color)
 
 int main(int argc, char* argv[])
 {
+    if (!Logger::GetInstance().Init()) {
+        return -1;
+    }
+
     if (!Window::GetInstance().Init()) {
         return -1;
     }
@@ -93,8 +98,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    // 
-    Triangle3 triangle {
+    /*Triangle3 triangle {
         Point3 { 50, 250, -50 },
         Point3 { 250, 250, -100 },
         Point3 { 50, 50, -150 }
@@ -104,7 +108,24 @@ int main(int argc, char* argv[])
         Point2 { triangle.vertexA.x, triangle.vertexA.y },
         Point2 { triangle.vertexB.x, triangle.vertexB.y },
         Point2 { triangle.vertexC.x, triangle.vertexC.y }
-    }, Color::WHITE);
+    }, Color::WHITE);*/
+
+    TgaImage image(Window::GetInstance().GetWidth(), Window::GetInstance().GetHeight(), TgaImageFormat::RGB);
+    if (!image.Load("diablo.tga")) {
+        return -1;
+    }
+
+    std::int32_t width = image.GetWidth();
+    std::int32_t height = image.GetHeight();
+    for (size_t i = 0; i < width; i++) {
+        for (size_t j = 0; j < height; j++) {
+            Point2 point {
+                static_cast<double>(i),
+                static_cast<double>(j)
+            };
+            DrawPoint(point, static_cast<Color>(image.GetPixelColor(i, j)));
+        }
+    }
 
     while(true) {
         Window::GetInstance().HandleInput();
@@ -114,6 +135,4 @@ int main(int argc, char* argv[])
 
         Window::GetInstance().Render();
     }
-
-    Window::GetInstance().DeInit();
 }

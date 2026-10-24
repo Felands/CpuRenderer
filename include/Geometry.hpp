@@ -2,7 +2,7 @@
 #define GEOMETRY_HPP
 
 #include <cassert>
-#include "Log.hpp"
+#include "Logger.hpp"
 
 template<unsigned int Dimension>
 struct Vector {

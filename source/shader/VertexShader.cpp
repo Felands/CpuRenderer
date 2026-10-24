@@ -1,5 +1,5 @@
 #include "VertexShader.hpp"
-#include "Log.hpp"
+#include "Logger.hpp"
 
 bool VertexShader::Init()
 {
@@ -14,6 +14,7 @@ bool VertexShader::Init()
 
     m_isInit = true;
     LOG_INFO("Vertex shader initialization successful.");
+    return true;
 }
 
 void VertexShader::Transform(Triangle3& triangle)

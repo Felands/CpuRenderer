@@ -2,8 +2,8 @@
 #define COLOR_HPP
 
 enum class Color {
-    BLACK = 0x000000,
-    WHITE = 0xFFFFFF,
+    BLACK = 0x00000000,
+    WHITE = 0x00FFFFFF,
 };
 
 #endif

@@ -67,12 +67,12 @@ public:
 
 private:
     Window() {}
-    ~Window() {}
+    ~Window();
     static LRESULT CALLBACK WindowProcess(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
     LRESULT HandleWindowMessage(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-    inline static constexpr unsigned int WINDOW_WIDTH = 800;
-    inline static constexpr unsigned int WINDOW_HEIGHT = 600;
+    inline static constexpr unsigned int WINDOW_WIDTH = 1960;
+    inline static constexpr unsigned int WINDOW_HEIGHT = 1080;
     inline static constexpr const char* WINDOW_NAME = "CPU Renderer";
     inline static constexpr const char* WINDOW_CLASS_NAME = "CpuRendererWindow";
 
