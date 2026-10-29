@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
         Point2 { triangle.vertexC.x, triangle.vertexC.y }
     }, Color::WHITE);*/
 
-    TgaImage image(Window::GetInstance().GetWidth(), Window::GetInstance().GetHeight(), TgaImageFormat::RGB);
+    /*TgaImage image(Window::GetInstance().GetWidth(), Window::GetInstance().GetHeight(), TgaImageFormat::RGB);
     if (!image.Load("diablo.tga")) {
         return -1;
     }
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
             };
             DrawPoint(point, static_cast<Color>(image.GetPixelColor(i, j)));
         }
-    }
+    }*/
 
     while(true) {
         Window::GetInstance().HandleInput();

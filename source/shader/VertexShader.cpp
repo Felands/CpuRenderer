@@ -43,29 +43,50 @@ void VertexShader::Transform(Point4& point)
     point = m_prespectiveMatrix * (m_viewMatrix * (m_modelMatrix * point));
 }
 
+// Scale the model down by a factor of 2, rotate it 90 degrees to the left around the y-axis, shift it 500 pixels in the positive x-direction, and place it into the space.
 void VertexShader::InitModelMatrix()
 {
-    // Scale the model down by a factor of 2, rotate it 90 degrees to the left around the y-axis, shift it 500 pixels in the positive x-direction, and place it into the space.
     m_modelMatrix = TRANSLATION_RIGHT_500_MATRIX_4 * (ROTATION_LEFT_90_MATRIX_4 * SCALE_HALF_MATRIX_4);
 }
 
+// Using the camera's focus as the center, take the opposite of the camera's viewing direction as the z-axis, and then add the top of the camera to construct the view matrix.
 void VertexShader::InitViewMatrix()
 {
-    static Vector<3> cameraPosition { -10, 8, 5 };
-    static Vector<3> focusPositin { 0, 0, 0 };
-    Vector<3> direction = focusPositin - cameraPosition;
-    m_viewMatrix = {
+    static Vector<3> camera { -10, 8, 5 };
+    static Vector<3> focus { 0, 0, 0 };
+    static Vector<3> up { 0, 1, 0 };
+    OrthonormalBasis3 basis = BuildOrthonormalBasis(up, camera - focus);
+    Vector<3> xAxis = basis.xAxis;
+    Vector<3> yAxis = basis.yAxis;
+    Vector<3> zAxis = basis.zAxis;
+
+    Matrix4_4 move = {
         {
-            { 1, 0, 0, -direction.x },
-            { 0, 1, 0, -direction.y },
-            { 0, 0, 1, -direction.z },
+            { 1, 0, 0, -focus.x },
+            { 0, 1, 0, -focus.y },
+            { 0, 0, 1, -focus.z },
             { 0, 0, 0, 1 }
         }
     };
+    Matrix4_4 transform = {
+        {
+            { xAxis.x, xAxis.y, xAxis.z, 0 },
+            { yAxis.x, yAxis.y, yAxis.z, 0 },
+            { zAxis.x, zAxis.y, zAxis.z, 0 },
+            { 0, 0, 0, 1 }
+        }
+    };
+    m_viewMatrix = transform * move;
 };
 
 void VertexShader::InitPrespectiveMatrix()
 {
-    m_prespectiveMatrix = IDENTITY_MATRIX_4;
-    return;
+    m_prespectiveMatrix = {
+        {
+            { 1, 0, 0, 0 },
+            { 0, 1, 0, 0 },
+            { 0, 0, 1, 0 },
+            { 0, 0, -1 / 2, 1 }
+        }
+    };
 }

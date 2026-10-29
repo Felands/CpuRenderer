@@ -2,6 +2,7 @@
 #define GEOMETRY_HPP
 
 #include <cassert>
+#include <cmath>
 #include "Logger.hpp"
 
 template<unsigned int Dimension>
@@ -70,6 +71,69 @@ struct Vector<4> {
     }
 };
 
+template<int Dimension>
+Vector<Dimension> operator-(const Vector<Dimension>& lhs, const Vector<Dimension>& rhs) {
+    Vector<Dimension> ret = lhs;
+    for (size_t index = 0; index < Dimension; index++) {
+        ret[index] -= rhs[index];
+    }
+    return ret;
+}
+
+template<int Dimension>
+double operator*(const Vector<Dimension>& lhs, const Vector<Dimension>& rhs) {
+    double ret = 0;
+    for (size_t index = 0; index < Dimension; index++) {
+        ret += lhs[index] * rhs[index];
+    }
+    return ret;
+}
+
+template<int Dimension>
+Vector<Dimension> operator/(const Vector<Dimension>& lhs, const double& rhs)
+{
+    Vector<Dimension> ret = lhs;
+    for (size_t index = 0; index < Dimension; index++) {
+        ret[index] /= rhs;
+    }
+    return ret;
+}
+
+template<int Dimension>
+double Length(const Vector<Dimension>& vec)
+{
+    return std::sqrt(vec * vec);
+}
+
+template<int Dimension>
+Vector<Dimension> Normalize(const Vector<Dimension>& vec)
+{
+    return vec / Length(vec);
+}
+
+inline Vector<3> Cross(const Vector<3>& vec1, const Vector<3>& vec2)
+{
+    return {
+        vec1.y * vec2.z - vec1.z * vec2.y,
+        vec1.z * vec2.x - vec1.x * vec2.z,
+        vec1.x * vec2.y - vec1.y * vec2.x
+    };
+}
+
+struct OrthonormalBasis3 {
+    Vector<3> xAxis;
+    Vector<3> yAxis;
+    Vector<3> zAxis;
+};
+
+inline OrthonormalBasis3 BuildOrthonormalBasis(const Vector<3>& lhs, const Vector<3>& rhs)
+{
+    Vector<3> zAxis = Normalize(rhs);
+    Vector<3> xAxis = Normalize(Cross(lhs, rhs));
+    Vector<3> yAxis = Normalize(Cross(xAxis, zAxis));
+    return OrthonormalBasis3{ xAxis, yAxis, zAxis };
+}
+
 using Point2 = Vector<2>;
 
 struct Line2 {
@@ -97,24 +161,6 @@ struct Triangle3 {
 };
 
 using Point4 = Vector<4>;
-
-template<int Dimension>
-Vector<Dimension> operator-(const Vector<Dimension>& lhs, const Vector<Dimension>& rhs) {
-    Vector<Dimension> ret = lhs;
-    for (size_t index = 0; index < Dimension; index++) {
-        ret[index] -= rhs[index];
-    }
-    return ret;
-}
-
-template<int Dimension>
-double operator*(const Vector<Dimension>& lhs, const Vector<Dimension>& rhs) {
-    double ret = 0;
-    for (size_t index = 0; index < Dimension; index++) {
-        ret += lhs[index] * rhs[index];
-    }
-    return ret;
-}
 
 template<unsigned int ROW_COUNT, unsigned int COLUM_COUNT>
 struct Matrix {
@@ -165,7 +211,6 @@ Matrix<N1, N3> operator*(const Matrix<N1, N2>& lhs, const Matrix<N2,N3>& rhs)
     }
     return ret;
 }
-
 
 using Matrix4_4 = Matrix<4, 4>;
 
