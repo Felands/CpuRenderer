@@ -4,6 +4,7 @@
 
 #include "Color.hpp"
 #include "Geometry.hpp"
+#include "Logger.hpp"
 #include "TgaImage.hpp"
 #include "VertexShader.hpp"
 #include "Window.hpp"
@@ -93,24 +94,22 @@ int main(int argc, char* argv[])
     if (!Window::GetInstance().Init()) {
         return -1;
     }
+    std::int32_t windowWidth = Window::GetInstance().GetWidth();
+    std::int32_t windowHeight = Window::GetInstance().GetHeight();
 
-    if (!VertexShader::GetInstance().Init()) {
+    if (!VertexShader::GetInstance().Init(windowWidth, windowHeight)) {
         return -1;
     }
 
-    /*Triangle3 triangle {
-        Point3 { 50, 250, -50 },
-        Point3 { 250, 250, -100 },
-        Point3 { 50, 50, -150 }
+    Triangle3 triangle3 {
+        Point3 { 0.103434, 0.63749, 0.102854 },
+        Point3 { 0.120409, 0.670105, 0.118388 },
+        Point3 { 0.113204, 0.661161, 0.119513 }
     };
-    VertexShader::GetInstance().Transform(triangle);
-    DrawTriangle(Triangle2 {
-        Point2 { triangle.vertexA.x, triangle.vertexA.y },
-        Point2 { triangle.vertexB.x, triangle.vertexB.y },
-        Point2 { triangle.vertexC.x, triangle.vertexC.y }
-    }, Color::WHITE);*/
+    Triangle2 triangle2 = VertexShader::GetInstance().Transform(triangle3);
+    DrawTriangle(triangle2, Color::WHITE);
 
-    /*TgaImage image(Window::GetInstance().GetWidth(), Window::GetInstance().GetHeight(), TgaImageFormat::RGB);
+    /*TgaImage image(windowWidth, windowHeight, TgaImageFormat::RGB);
     if (!image.Load("diablo.tga")) {
         return -1;
     }
