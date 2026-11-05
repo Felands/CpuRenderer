@@ -14,12 +14,32 @@ struct Vector {
         assert(index >= 0 && index < Dimension);
         return data[index];
     }
+
+    const double& operator[](const size_t index) const
+    {
+        assert(index >= 0 && index < Dimension);
+        return data[index];
+    }
 };
 
 template<>
 struct Vector<2> {
     double x;
     double y;
+
+    double& operator[](const size_t index)
+    {
+        assert(index >= 0 && index < 2);
+        if (index == 0) return x;
+        if (index == 1) return y;
+    }
+
+    double operator[](const size_t index) const
+    {
+        assert(index >= 0 && index < 2);
+        if (index == 0) return x;
+        if (index == 1) return y;
+    }
 };
 
 template<>
@@ -187,6 +207,69 @@ struct Matrix {
         assert(index >= 0 && index < ROW_COUNT);
         return data[index];
     }
+
+    double Determinant() const
+    {
+        static_assert(ROW_COUNT == COLUM_COUNT, "Determinant requires a square matrix");
+        static_assert(ROW_COUNT > 0, "Matrix dimension must be positive");
+
+        if constexpr (ROW_COUNT == 1) {
+            return data[0][0];
+        } else {
+            double result = 0.0;
+            for (size_t col = 0; col < COLUM_COUNT; ++col) {
+                Matrix<ROW_COUNT - 1, COLUM_COUNT - 1> minor{};
+
+                for (size_t row = 1; row < ROW_COUNT; ++row) {
+                    size_t minorCol = 0;
+
+                    for (size_t sourceCol = 0; sourceCol < COLUM_COUNT; ++sourceCol) {
+                        if (sourceCol == col) {
+                            continue;
+                        }
+
+                        minor[row - 1][minorCol++] = data[row][sourceCol];
+                    }
+                }
+
+                const double sign = (col % 2 == 0) ? 1.0 : -1.0;
+                result += sign * data[0][col] * minor.Determinant();
+            }
+            return result;
+        }
+    }
+
+    double Cofactor(const size_t row, const size_t col) const
+    {
+        Matrix<ROW_COUNT - 1, COLUM_COUNT - 1> cofactorMatrix;
+        size_t coI = 0;
+        size_t coJ = 0;
+        for (size_t i = 0; i < ROW_COUNT; i++) {
+            if (i == row) {
+                continue;
+            }
+
+            for (size_t j = 0; j < COLUM_COUNT; j++) {
+                if (j == col) {
+                    continue;
+                }
+
+                cofactorMatrix[coI++][coJ++] = data[i][j]; 
+            }
+        }
+        return cofactorMatrix.Determinant() * ((row + col) % 2 ? -1 : 1);
+    }
+
+    Matrix<ROW_COUNT, COLUM_COUNT> InvertTranspose() const
+    {
+        Matrix<ROW_COUNT, COLUM_COUNT> adjugateTranspose;
+        for (size_t i = 0; i < ROW_COUNT; i++) {
+            for (size_t j = 0; j < COLUM_COUNT; j++) {
+                adjugateTranspose[i][j] = Cofactor(i, j);
+            }
+        }
+        return adjugateTranspose / Determinant();
+    }
 };
 
 template<unsigned int ROW_COUNT, unsigned int COLUM_COUNT>
@@ -208,6 +291,15 @@ Matrix<N1, N3> operator*(const Matrix<N1, N2>& lhs, const Matrix<N2,N3>& rhs)
                 ret[i][j] += lhs[i][k] * rhs[k][j];
             }
         }
+    }
+    return ret;
+}
+
+template<unsigned int ROW_COUNT, unsigned int COLUM_COUNT>
+Matrix<ROW_COUNT, COLUM_COUNT> operator/(const Matrix<ROW_COUNT, COLUM_COUNT>& lhs, const double value) {
+    Matrix<ROW_COUNT, COLUM_COUNT> ret {};
+    for (size_t index = 0; index < ROW_COUNT; index++) {
+        ret[index] = lhs[index] / value;
     }
     return ret;
 }

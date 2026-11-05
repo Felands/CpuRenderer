@@ -5,6 +5,7 @@
 #include "Color.hpp"
 #include "Geometry.hpp"
 #include "Logger.hpp"
+#include "Rasterize.hpp"
 #include "TgaImage.hpp"
 #include "VertexShader.hpp"
 #include "Window.hpp"
@@ -107,6 +108,7 @@ int main(int argc, char* argv[])
         Point3 { 0.113204, 0.661161, 0.119513 }
     };
     Triangle2 triangle2 = VertexShader::GetInstance().Transform(triangle3);
+    std::vector<Point2> ret = Rasterize(triangle2, windowWidth, windowHeight);
     DrawTriangle(triangle2, Color::WHITE);
 
     /*TgaImage image(windowWidth, windowHeight, TgaImageFormat::RGB);

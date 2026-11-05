@@ -26,6 +26,7 @@ set(SOURCE_FILES
     source/main.cpp
     source/image/TgaImage.cpp
     source/log/Logger.cpp
+    source/shader/Rasterize.cpp
     source/shader/VertexShader.cpp
     source/window/Window.cpp)
 add_executable(CpuRenderer ${SOURCE_FILES})
