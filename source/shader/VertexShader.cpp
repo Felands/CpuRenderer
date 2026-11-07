@@ -20,17 +20,19 @@ bool VertexShader::Init(std::int32_t width, std::int32_t height)
     return true;
 }
 
-Triangle2 VertexShader::Transform(Triangle3& triangle)
+void VertexShader::Transform(Triangle3& triangle, Triangle3& ndc, Triangle2& screen)
 {
     Point4 tmpA { triangle.vertexA.x, triangle.vertexA.y, triangle.vertexA.z, 1 };
     Point4 tmpB { triangle.vertexB.x, triangle.vertexB.y, triangle.vertexB.z, 1 };
     Point4 tmpC { triangle.vertexC.x, triangle.vertexC.y, triangle.vertexC.z, 1 };
 
-    Triangle2 ret {};
-    ret.vertexA = TransformScreen(TransformNDC(TransformMVP(tmpA)));
-    ret.vertexB = TransformScreen(TransformNDC(TransformMVP(tmpB)));
-    ret.vertexC = TransformScreen(TransformNDC(TransformMVP(tmpC)));
-    return ret;
+    ndc.vertexA = TransformNDC(TransformMVP(tmpA));
+    ndc.vertexB = TransformNDC(TransformMVP(tmpB));
+    ndc.vertexC = TransformNDC(TransformMVP(tmpC));
+
+    screen.vertexA = TransformScreen(ndc.vertexA);
+    screen.vertexB = TransformScreen(ndc.vertexB);
+    screen.vertexC = TransformScreen(ndc.vertexC);
 }
 
 Point4 VertexShader::TransformMVP(Point4 point)

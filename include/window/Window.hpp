@@ -1,6 +1,7 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
+#include <cstdint>
 #include <windows.h>
 #include <windowsx.h>
 #include "Color.hpp"
@@ -50,14 +51,12 @@ public:
         return m_isQuit;
     }
 
-    void Draw(const Point2& point, Color color)
+    void Draw(std::int32_t x, std::int32_t y, Color color)
     {
-        if (point.x < 0 || point.x >= static_cast<unsigned int>(WINDOW_WIDTH) || point.y < 0 || point.y >= static_cast<unsigned int>(WINDOW_HEIGHT)) {
+        if (x < 0 || x >= static_cast<unsigned int>(WINDOW_WIDTH) || y < 0 || y >= static_cast<unsigned int>(WINDOW_HEIGHT)) {
             return;
         }
 
-        unsigned int x = point.x;
-        unsigned int y = point.y;
         m_canvas[y * WINDOW_WIDTH + x] = static_cast<unsigned int>(color);
     }
 

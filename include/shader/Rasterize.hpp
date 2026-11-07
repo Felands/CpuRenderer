@@ -4,6 +4,6 @@
 #include <vector>
 #include "Geometry.hpp"
 
-std::vector<Point2> Rasterize(const Triangle2& triangle, std::int32_t width, std::int32_t height);
+void Rasterize(const Triangle3& ndc, const Triangle2& screen);
 
 #endif

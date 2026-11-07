@@ -15,7 +15,7 @@ public:
 
     bool Init(std::int32_t windowWidth, std::int32_t windowHeight);
 
-    Triangle2 Transform(Triangle3& triangle);
+    void Transform(Triangle3& triangle, Triangle3& ndc, Triangle2& screen);
 
 private:
     VertexShader() = default;

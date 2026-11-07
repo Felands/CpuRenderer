@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cmath>
+#include <vector>
 
 #include "Color.hpp"
 #include "Geometry.hpp"
@@ -12,7 +13,9 @@
 
 void DrawPoint(const Point2& point, Color color)
 {
-    Window::GetInstance().Draw(point, color);
+    std::int32_t x = static_cast<std::int32_t>(point.x);
+    std::int32_t y = static_cast<std::int32_t>(point.y);
+    Window::GetInstance().Draw(x, y, color);
 }
 
 void DrawLine(const Line2& line, Color color)
@@ -102,14 +105,15 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    Triangle3 triangle3 {
+    Triangle3 origin {
         Point3 { 0.103434, 0.63749, 0.102854 },
         Point3 { 0.120409, 0.670105, 0.118388 },
         Point3 { 0.113204, 0.661161, 0.119513 }
     };
-    Triangle2 triangle2 = VertexShader::GetInstance().Transform(triangle3);
-    std::vector<Point2> ret = Rasterize(triangle2, windowWidth, windowHeight);
-    DrawTriangle(triangle2, Color::WHITE);
+    Triangle3 ndc{};
+    Triangle2 screen{};
+    VertexShader::GetInstance().Transform(origin, ndc, screen);
+    Rasterize(ndc, screen);
 
     /*TgaImage image(windowWidth, windowHeight, TgaImageFormat::RGB);
     if (!image.Load("diablo.tga")) {

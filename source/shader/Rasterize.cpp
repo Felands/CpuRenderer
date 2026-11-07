@@ -2,25 +2,26 @@
 #include <algorithm>
 #include <cstdint>
 #include <cmath>
+#include "Window.hpp"
 
-std::vector<Point2> Rasterize(const Triangle2& triangle, std::int32_t width, std::int32_t height)
+void Rasterize(const Triangle3& ndc, const Triangle2& screen)
 {
-    std::vector<Point2> ret;
+    static std::vector<double> zbuffer(width * height, -1000.0);
 
     Matrix<3, 3> ext = {
         {
-            { triangle.vertexA.x, triangle.vertexA.y, 1 },
-            { triangle.vertexB.x, triangle.vertexB.y, 1 },
-            { triangle.vertexC.x, triangle.vertexC.y, 1 },
+            { screen.vertexA.x, screen.vertexA.y, 1 },
+            { screen.vertexB.x, screen.vertexB.y, 1 },
+            { screen.vertexC.x, screen.vertexC.y, 1 },
         }
     };
     
     if (ext.Determinant() / 2.0 < 1) {
-        return ret;
+        return;
     }
 
-    auto [minx, maxx] = std::minmax({triangle.vertexA.x, triangle.vertexB.x, triangle.vertexC.x});
-    auto [miny, maxy] = std::minmax({triangle.vertexA.y, triangle.vertexB.y, triangle.vertexC.y});
+    auto [minx, maxx] = std::minmax({screen.vertexA.x, screen.vertexB.x, screen.vertexC.x});
+    auto [miny, maxy] = std::minmax({screen.vertexA.y, screen.vertexB.y, screen.vertexC.y});
     minx = std::max<int>(minx, 0);
     maxx = std::min<int>(maxx, width - 1);
     miny = std::max<int>(miny, 0);
@@ -31,8 +32,15 @@ std::vector<Point2> Rasterize(const Triangle2& triangle, std::int32_t width, std
             if (barycentricCoordinate.x < 0 || barycentricCoordinate.y < 0 || barycentricCoordinate.z < 0) {
                 continue;
             }
-            ret.emplace_back(Point2{static_cast<double>(x), static_cast<double>(y)});
+
+            double z = barycentricCoordinate * Vector<3>{ ndc[0].z, ndc[1].z, ndc[2].z };
+            if (z <= zbuffer[x + y * width]) {
+                continue;
+            }
+            zbuffer[x + y * width] = z;
+
+            
+            Window::GetInstance().Draw(x, y, color);
         }
     }
-    return ret;
 }
